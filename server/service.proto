@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package imageprocessing;
 
+option go_package = "github.com/SV1Stail/imageRrocessing/gen";
+
 service ImageProcessingService{
 	rpc ConvertToMonochrome (MonochromeRequest) returns (ImageResponse);
 	rpc ConvertToBinary (BinaryRequest) returns (ImageResponse);
