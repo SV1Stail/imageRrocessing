@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package imageprocessing;
+
+service ImageProcessingService{
+	rpc ConvertToMonochrome (MonochromeRequest) returns (ImageResponse);
+	rpc ConvertToBinary (BinaryRequest) returns (ImageResponse);
+	rpc ConvertToThreshold (ThresholdRequest) returns (ImageResponse);
+}
+
+message MonochromeRequest {
+	bytes image_data = 1;
+	string target_color = 2;
+}
+
+message BinaryRequest {
+	bytes image_data = 1;
+}
+
+message ThresholdRequest {
+	bytes image_data = 1;
+	int32 threshold = 2; // 0-255 
+}
+
+message ImageResponse {
+    bytes processed_image_data = 1; 
+}
