@@ -2,22 +2,27 @@ package main
 
 import (
 	"net"
+	"os"
 
-	"github.com/SV1Stail/imageRrocessing/server"
-	pb "github.com/SV1Stail/imageRrocessing/server/imageRrocessing/gen"
+	pb "github.com/SV1Stail/imageRrocessing/grpc_server/imageRrocessing/gen"
+	"github.com/SV1Stail/imageRrocessing/grpc_server/server"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
 	"google.golang.org/grpc"
 )
 
-func Init() {
+var (
+	GrpcPort string
+)
+
+func init() {
 	zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	GrpcPort = os.Getenv("GRPC_PORT")
 }
 
 func main() {
-
-	lis, err := net.Listen("tcp", ":50051")
+	lis, err := net.Listen("tcp", ":"+GrpcPort)
 	if err != nil {
 		log.Err(err).Msg("failed start listen")
 	}
@@ -25,7 +30,7 @@ func main() {
 	grpcServer := grpc.NewServer()
 	pb.RegisterImageProcessingServiceServer(grpcServer, &server.Server{})
 
-	log.Info().Msg("Server is running on port 50051...")
+	log.Info().Msgf("Server is running on port %s...", GrpcPort)
 
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Err(err).Msg("failed to serve")

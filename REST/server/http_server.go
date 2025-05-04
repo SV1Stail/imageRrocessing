@@ -4,26 +4,37 @@ import (
 	"context"
 	"io"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	pb "github.com/SV1Stail/imageRrocessing/server/imageRrocessing/gen"
+	pb "github.com/SV1Stail/imageRrocessing/REST/server/gen"
 )
 
 var grpcClient pb.ImageProcessingServiceClient
 
-func InitGRPCClient() {
+func InitGRPCClient() error {
+	grpcServerAddress := os.Getenv("GRPC_SERVER_ADDRESS")
+
+	if grpcServerAddress == "" {
+		log.Err(ErrBadRequest).Msg("empty grpc server address")
+		return ErrBadRequest
+	}
+
 	conn, err := grpc.NewClient(
-		"localhost:50051", // Адрес вашего gRPC-сервера
+		grpcServerAddress,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
 		log.Err(err).Msg("Failed to connect to gRPC server")
+		return ErrInternal
 	}
 	grpcClient = pb.NewImageProcessingServiceClient(conn)
+
+	return nil
 }
 
 func UploadHandler(w http.ResponseWriter, r *http.Request) {
@@ -75,7 +86,7 @@ func UploadHandler(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 	if err != nil {
-		log.Err(ErrInternal).Msg("gRPC call failed")
+		log.Err(err).Msg("gRPC call failed")
 		http.Error(w, "gRPC call failed: "+err.Error(), http.StatusInternalServerError)
 		return
 	}

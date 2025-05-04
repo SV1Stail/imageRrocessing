@@ -1,0 +1,30 @@
+services:
+  grpc_server:
+    build:
+      context: .
+      dockerfile: ./grpc_server/Dockerfile
+    environment:
+      - GRPC_PORT=${GRPC_PORT}
+    ports:
+      - "${GRPC_PORT}:${GRPC_PORT}"
+    networks:
+      - app-network
+
+  rest_server:
+    build:
+      context: .
+      dockerfile: ./REST/Dockerfile
+    environment:
+      - GRPC_SERVER_ADDRESS=${GRPC_SERVER_ADDRESS}
+      - REST_CONTAINER_PORT=${REST_CONTAINER_PORT}
+    ports:
+      - "${REST_HOST_PORT}:${REST_CONTAINER_PORT}"
+    depends_on:
+      - grpc_server
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
