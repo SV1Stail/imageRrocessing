@@ -6,4 +6,4 @@ run or install and run Docker
 run sh -h
 ```
 
-working on localhost:8092 by default (change in .env
+working on localhost:8092 by default (change in .env)
