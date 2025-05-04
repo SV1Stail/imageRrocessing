@@ -4,16 +4,18 @@ import (
 	"net"
 
 	"github.com/SV1Stail/imageRrocessing/server"
-	pb "github.com/SV1Stail/imageRrocessing/server/github.com/SV1Stail/imageRrocessing/gen"
+	pb "github.com/SV1Stail/imageRrocessing/server/imageRrocessing/gen"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
 	"google.golang.org/grpc"
 )
 
-func main() {
-
+func Init() {
 	zerolog.SetGlobalLevel(zerolog.DebugLevel)
+}
+
+func main() {
 
 	lis, err := net.Listen("tcp", ":50051")
 	if err != nil {

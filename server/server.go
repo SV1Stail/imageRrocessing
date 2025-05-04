@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"strings"
 
-	pb "github.com/SV1Stail/imageRrocessing/server/github.com/SV1Stail/imageRrocessing/gen"
+	pb "github.com/SV1Stail/imageRrocessing/server/imageRrocessing/gen"
 	"github.com/disintegration/imaging"
 	"github.com/rs/zerolog/log"
 )

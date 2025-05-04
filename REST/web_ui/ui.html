@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Processor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .image-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        img {
+            max-width: 100%;
+            border: 1px solid #ddd;
+        }
+
+        button {
+            padding: 10px 15px;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        #processBtn {
+            background: #007BFF;
+        }
+
+        #downloadBtn {
+            background: #28a745;
+            display: none;
+        }
+
+        .controls {
+            margin: 15px 0;
+        }
+
+        .threshold-control,
+        .monochrome-control {
+            margin-top: 10px;
+            display: none;
+        }
+
+        input[type="color"] {
+            width: 50px;
+            height: 30px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Image Processor</h1>
+    <input type="file" id="imageInput" accept="image/*">
+
+    <div class="controls">
+        <h3>Processing Type</h3>
+        <label>
+            <input type="radio" name="processingType" value="binary" checked>
+            Convert to Binary
+        </label><br>
+        <label>
+            <input type="radio" name="processingType" value="monochrome">
+            Convert to Monochrome
+        </label><br>
+        <label>
+            <input type="radio" name="processingType" value="threshold">
+            Threshold
+        </label>
+
+        <div id="thresholdControl" class="threshold-control">
+            <label>
+                Threshold value (0-255):
+                <input type="number" id="thresholdValue" min="0" max="255" value="128">
+            </label>
+        </div>
+
+        <div id="monochromeControl" class="monochrome-control">
+            <label>
+                Target color (HEX):
+                <input type="color" id="targetColor" value="#FF0000">
+            </label>
+        </div>
+    </div>
+
+    <button id="processBtn" onclick="processImage()">Process Image</button>
+    <button id="downloadBtn" onclick="downloadImage()">Download Processed Image</button>
+
+    <div class="image-container">
+        <div>
+            <h3>Original</h3>
+            <img id="originalImage" src="" alt="Original Image">
+        </div>
+        <div>
+            <h3>Processed</h3>
+            <img id="processedImage" src="" alt="Processed Image">
+        </div>
+    </div>
+
+    <script>
+        let originalImageData = null;
+        let processedImageUrl = null;
+
+        document.querySelectorAll('input[name="processingType"]').forEach(radio => {
+            radio.addEventListener('change', function () {
+                document.getElementById('thresholdControl').style.display =
+                    this.value === 'threshold' ? 'block' : 'none';
+                document.getElementById('monochromeControl').style.display =
+                    this.value === 'monochrome' ? 'block' : 'none';
+            });
+        });
+
+        document.getElementById('imageInput').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                document.getElementById('originalImage').src = event.target.result;
+                originalImageData = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        async function processImage() {
+            if (!originalImageData) {
+                alert("Please upload an image first!");
+                return;
+            }
+
+            const processingType = document.querySelector('input[name="processingType"]:checked').value;
+            const formData = new FormData();
+            const blob = await fetch(originalImageData).then(res => res.blob());
+            formData.append("image", blob);
+            formData.append("type", processingType);
+
+            if (processingType === 'threshold') {
+                const threshold = document.getElementById('thresholdValue').value;
+                formData.append("threshold", threshold);
+            } else if (processingType === 'monochrome') {
+                const colorHex = document.getElementById('targetColor').value;
+                formData.append("color", colorHex);
+            }
+
+            const response = await fetch("/upload", {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!response.ok) {
+                alert("Error processing image!");
+                return;
+            }
+
+            const processedBlob = await response.blob();
+            processedImageUrl = URL.createObjectURL(processedBlob);
+            document.getElementById('processedImage').src = processedImageUrl;
+            document.getElementById('downloadBtn').style.display = 'block';
+        }
+
+        function downloadImage() {
+            if (!processedImageUrl) return;
+
+            const link = document.createElement('a');
+            link.href = processedImageUrl;
+            link.download = 'processed_image.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+
+</html>

@@ -7,10 +7,14 @@ import (
 	"os"
 	"sync"
 
-	pb "github.com/SV1Stail/imageRrocessing/client/github.com/SV1Stail/imageRrocessing/gen"
+	pb "github.com/SV1Stail/imageRrocessing/client/imageRrocessing/gen"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+)
+
+const (
+	pic = "new.png"
 )
 
 func main() {
@@ -21,7 +25,7 @@ func main() {
 	defer conn.Close()
 	client := pb.NewImageProcessingServiceClient(conn)
 
-	imageData, err := os.ReadFile("new.png")
+	imageData, err := os.ReadFile(pic)
 	if err != nil {
 		log.Fatalf("failed to read image: %v", err)
 	}

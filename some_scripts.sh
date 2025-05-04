@@ -10,4 +10,4 @@ go get google.golang.org/protobuf
 go get google.golang.org/grpc
 
 # генерация прото дял сервера
-svs@svs-pc:~/work/imageRrocessing$ protoc --go_out=./server --go-grpc_out=./server ./server/service.proto
+svs@svs-pc:~/work/imageRrocessing$ protoc --go_out=./server --go-grpc_out=./server ./service.proto
