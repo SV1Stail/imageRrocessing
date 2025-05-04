@@ -5,3 +5,5 @@ run or install and run Docker
 ```bash
 run sh -h
 ```
+
+working on localhost:8092 by default (change in .env
